@@ -1,0 +1,142 @@
+/* Import eksternal */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Open+Sans&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+
+/* Warna utama kopi */
+:root {
+  --primary-color: #5c4433;
+  --primary-dark: #3e2a1e;
+  --secondary-color: #bfa88f;
+  --secondary-dark: #a7927a;
+}
+
+/* Latar belakang dan font */
+body {
+  background: url("../images/welcome.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Efek masuk */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Kontainer form login/register */
+.auth-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 50px 60px; /* lebih lega secara horizontal */
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px; /* sebelumnya 400px */
+  border: 1px solid #e1d7cd;
+  animation: fadeIn 1.2s ease forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Judul form */
+.auth-card h3 {
+  font-family: 'Playfair Display', serif;
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+/* Subjudul */
+.auth-card p {
+  color: #6e6256;
+  margin-bottom: 30px;
+  font-size: 1rem;
+}
+
+/* Input */
+.form-control {
+  border-radius: 6px;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(92, 68, 51, 0.25);
+}
+
+/* Label */
+.form-label {
+  font-weight: 500;
+  color: var(--primary-dark);
+}
+
+/* Tombol */
+.btn-auth {
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-size: 0.95rem;
+}
+
+/* Tombol masuk */
+.btn-masuk {
+  background-color: var(--primary-color);
+  color: #fff !important;
+  border: none;
+}
+
+.btn-masuk:hover {
+  background-color: var(--primary-dark);
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Tombol daftar */
+.btn-daftar {
+  background-color: var(--secondary-color);
+  color: #fff !important;
+  border: none;
+}
+
+.btn-daftar:hover {
+  background-color: var(--secondary-dark);
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Link */
+a {
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 30px 20px;
+    max-width: 100%;
+    margin: 20px;
+  }
+}

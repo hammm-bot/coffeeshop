@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Welcome - CoffeeShop</title>
+
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="{% static 'frontsite/css/welcome.css' %}" />
+
+    <!-- Tambahan untuk favicon (optional) -->
+    <link rel="icon" href="{% static 'frontsite/images/favicon.ico' %}" />
+  </head>
+  <body>
+    <div class="welcome-container">
+      <h1 class="title">Selamat Datang di CoffeeShop</h1>
+      <p class="subtitle">Rasakan aroma dan kehangatan kopi klasik dengan sentuhan modern. Yuk mulai sekarang!</p>
+
+      <div class="button-group">
+        <a href="{% url 'login' %}" class="welcome-btn"><i class="fa fa-sign-in-alt"></i> Masuk</a>
+        <a href="{% url 'register' %}" class="welcome-btn secondary"><i class="fa fa-user-plus"></i> Daftar</a>
+      </div>
+    </div>
+  </body>
+</html>

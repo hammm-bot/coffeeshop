@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar - CoffeeShop</title>
+    <link rel="stylesheet" href="{% static 'frontsite/css/auth.css' %}" />
+  </head>
+  <body>
+    <div class="auth-card">
+      <div class="text-center mb-4">
+        <h3>Buat Akun CoffeeShop</h3>
+        <p class="text-muted">Daftar dan nikmati pengalaman kopi klasik!</p>
+      </div>
+      <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="password1" class="form-label">Kata Sandi</label>
+          <input type="password" name="password1" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="password2" class="form-label">Konfirmasi Sandi</label>
+          <input type="password" name="password2" class="form-control" required />
+        </div>
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-auth btn-daftar"><i class="fa fa-user-plus me-1"></i> Daftar</button>
+        </div>
+        <p class="text-center">
+          Sudah punya akun? <a href="{% url 'login' %}">Masuk sekarang</a>
+        </p>
+      </form>
+    </div>
+  </body>
+</html>
