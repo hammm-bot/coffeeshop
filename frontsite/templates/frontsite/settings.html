@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+  Pengaturan Akun - CoffeeShop
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'frontsite/css/settings.css' %}" />
+  <div class="container settings-container">
+    <div class="settings-header text-center animate-fade">
+      <h3 class="settings-title d-flex justify-content-center align-items-center gap-2 mb-2">
+        <i class="fa-solid fa-gear"></i>
+        Kelola Profil Kamu
+      </h3>
+      <p class="settings-subtitle">Halo, {{ request.user.first_name|default:request.user.username }}! Kelola profilmu di sini ✨</p>
+    </div>
+
+    <!-- FORM PENGATURAN -->
+    <form method="POST" action="{% url 'update_profile' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- FOTO PROFIL -->
+      <div class="mb-3 text-center">
+        <img id="preview"
+          src="{% if user.profile.foto %}
+            {{ user.profile.foto.url }}
+          {% else %}
+            {% static 'frontsite/images/default-profile.png' %}
+          {% endif %}"
+          alt="Foto Profil"
+          class="settings-img-preview" />
+
+        <div class="settings-file-input">
+          <input class="form-control" type="file" name="photo" onchange="previewPhoto(event)" />
+        </div>
+      </div>
+
+      <!-- USERNAME -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" id="username" class="form-control" value="{{ user.username }}" />
+      </div>
+
+      <!-- EMAIL -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" class="form-control" value="{{ user.email }}" readonly />
+      </div>
+
+      <!-- SIMPAN -->
+      <button type="submit" class="settings-save-btn" id="saveBtn"><i class="fa fa-save me-1"></i> Simpan Perubahan</button>
+    </form>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const usernameInput = document.getElementById('username')
+    const photoInput = document.querySelector('input[name="photo"]')
+    const saveBtn = document.getElementById('saveBtn')
+    const originalUsername = usernameInput.value
+    
+    // Tampilkan tombol simpan jika ada perubahan
+    function showSaveBtn() {
+      saveBtn.style.display = 'inline-block'
+    }
+    
+    function hideSaveBtnIfUnchanged() {
+      if (usernameInput.value === originalUsername && photoInput.files.length === 0) {
+        saveBtn.style.display = 'none'
+      }
+    }
+    
+    // Event perubahan username
+    usernameInput.addEventListener('input', function () {
+      if (usernameInput.value !== originalUsername) {
+        showSaveBtn()
+      } else {
+        hideSaveBtnIfUnchanged()
+      }
+    })
+    
+    // Event ganti foto profil
+    photoInput.addEventListener('change', function (event) {
+      previewPhoto(event)
+      showSaveBtn()
+    })
+    
+    // Preview gambar langsung saat pilih foto
+    function previewPhoto(event) {
+      const input = event.target
+      const preview = document.getElementById('preview')
+    
+      if (input.files && input.files[0]) {
+        const reader = new FileReader()
+        reader.onload = function (e) {
+          preview.src = e.target.result
+        }
+        reader.readAsDataURL(input.files[0])
+      }
+    }
+  </script>
+{% endblock %}

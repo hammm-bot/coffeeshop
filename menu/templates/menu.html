@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Menu - CoffeeShop
+{% endblock %}
+
+{% block content %}
+  <div class="mt-5">
+    <h2 class="text-center mb-4">Menu Minuman Kami</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% comment %}Contoh 3 produk statis dulu{% endcomment %}
+      <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'images/espresso.jpg' %}" class="card-img-top" alt="Espresso" />
+          <div class="card-body">
+            <h5 class="card-title">Espresso</h5>
+            <p class="card-text">Kopi hitam pekat tanpa gula.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'images/latte.jpg' %}" class="card-img-top" alt="Latte" />
+          <div class="card-body">
+            <h5 class="card-title">Caffe Latte</h5>
+            <p class="card-text">Espresso dengan susu steamed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'images/cappuccino.jpg' %}" class="card-img-top" alt="Cappuccino" />
+          <div class="card-body">
+            <h5 class="card-title">Cappuccino</h5>
+            <p class="card-text">Perpaduan espresso, susu, dan foam.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

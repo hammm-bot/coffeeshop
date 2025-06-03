@@ -1,0 +1,128 @@
+:root {
+  --primary-color: #5d4037; /* Cokelat kopi */
+  --bg-light: #fdf6ee;
+  --text-dark: #3e2f25;
+}
+
+/* ===== Container ===== */
+.settings-container {
+  max-width: 600px;
+  margin: auto;
+  margin-top: 1rem;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Header ===== */
+.settings-header {
+  margin-top: 0.5rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.settings-title {
+  font-size: 26px;
+  color: var(--primary-color);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.settings-subtitle {
+  font-size: 14px;
+  color: #6c5c49;
+  font-weight: 500;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+/* ===== Foto Profil ===== */
+.settings-img-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--primary-color);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.settings-file-input {
+  display: block;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+/* ===== Input Form ===== */
+input[type="text"],
+input[type="email"],
+input[type="file"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1.2rem;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* ===== Tombol Simpan ===== */
+.settings-save-btn {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: 100%;
+  display: none;
+  margin-bottom: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.settings-save-btn:hover {
+  background-color: white;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  text-decoration: none;
+}
+
+/* ===== Tombol Logout ===== */
+.settings-logout-btn {
+  width: 100%;
+  background-color: #e0c9b1;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.settings-logout-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* ===== Efek Fade ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fadeIn 0.8s ease-out;
+}

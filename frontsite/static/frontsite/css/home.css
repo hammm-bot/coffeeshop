@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  background-color: #f9f5f1;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.page-heading {
+  padding-top: 5px;
+  margin-top: -10px;
+  margin-bottom: 40px; /* ini yang baru ditambahkan */
+  text-align: center;
+}
+
+.page-heading h1 {
+  font-size: 2.2rem;     /* sebelumnya 2.4rem */
+  color: #5c4433;
+  font-weight: bold;
+  margin: 0;
+}
+
+.home-layout {
+  display: flex;
+  height: calc(100vh - 100px); /* kurangin heading dan navbar */
+  margin: -35px; /* Hapus padding horizontal */
+}
+
+.image-side {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  padding-left: 20px; /* tambahkan padding agar tidak terlalu mepet */
+  display: flex;
+  align-items: center;
+}
+
+.image-side img {
+  width: 33rem;
+  height: 33rem;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px; /* agar terlihat "masuk ke dalam halaman" */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* bayangan bawah */
+  margin-bottom: 10px;
+}
+
+.text-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 40px;
+}
+
+.welcome-desc {
+  font-size: 1.1rem;
+  color: #6a5643;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-coffee,
+.btn-coffee-outline {
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-decoration: none;
+  border: none;
+  cursor: not-allowed;
+}
+
+.btn-coffee {
+  background-color: #5c4433;
+  color: white;
+}
+
+.btn-coffee-outline {
+  border: 2px solid #5c4433;
+  background-color: transparent;
+  color: #5c4433;
+}
+
+.btn-coffee:hover,
+.btn-coffee-outline:hover {
+  opacity: 0.9;
+}

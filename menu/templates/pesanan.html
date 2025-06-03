@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Pesanan - CoffeeShop
+{% endblock %}
+
+{% block content %}
+  <div class="mt-5">
+    <h2 class="text-center mb-4">Pesanan Aktif</h2>
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>No</th>
+          <th>Nama Produk</th>
+          <th>Jumlah</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Espresso</td>
+          <td>1</td>
+          <td>
+            <span class="badge bg-warning text-dark">Sedang diproses</span>
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Latte</td>
+          <td>2</td>
+          <td>
+            <span class="badge bg-success">Selesai</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

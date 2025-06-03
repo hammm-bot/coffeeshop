@@ -1,0 +1,110 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f4ef;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* GENERAL SECTION STYLE */
+.about-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 60px 80px;
+  flex-wrap: wrap;
+}
+
+.about-section.reverse {
+  flex-direction: row-reverse;
+}
+
+.about-image img {
+  width: 400px;
+  max-width: 90vw;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.about-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.intro {
+  color: #a86e3c;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.brand-name {
+  font-size: 52px;
+  font-weight: bold;
+  color: #2b1e16;
+}
+
+.mission {
+  font-size: 18px;
+  margin: 15px 0 30px;
+  color: #4d3a2f;
+}
+
+.mission .highlight {
+  color: #a86e3c;
+  font-weight: 600;
+}
+
+.about-text h2 {
+  font-size: 22px;
+  color: #3c2e1f;
+  margin-top: 20px;
+}
+
+.about-text p,
+.about-text ul {
+  font-size: 16px;
+  color: #4d3a2f;
+  line-height: 1.7;
+}
+
+.about-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-text ul li {
+  margin-bottom: 10px;
+}
+
+.about-footer {
+  text-align: center;
+  padding: 40px 20px;
+  background: none;              /* ❌ Hapus warna latar */
+  color: #4d3a2f;
+  margin-top: 40px;
+}
+
+.about-footer p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.social-icons a {
+  display: inline-block;
+  margin: 0 15px;
+  text-decoration: none;
+  color: #4d3a2f;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.social-icons a i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.social-icons a:hover {
+  color: #a86e3c;
+}
