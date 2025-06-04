@@ -1,43 +1,109 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-  Menu - CoffeeShop
+  Menu Kopi
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/menu.css' %}" />
 {% endblock %}
 
 {% block content %}
-  <div class="mt-5">
-    <h2 class="text-center mb-4">Menu Minuman Kami</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      {% comment %}Contoh 3 produk statis dulu{% endcomment %}
-      <div class="col">
-        <div class="card h-100">
-          <img src="{% static 'images/espresso.jpg' %}" class="card-img-top" alt="Espresso" />
-          <div class="card-body">
-            <h5 class="card-title">Espresso</h5>
-            <p class="card-text">Kopi hitam pekat tanpa gula.</p>
-          </div>
-        </div>
-      </div>
+  <div class="container py-4">
+    <div class="judul-menu">
+      <i class="fas fa-mug-hot"></i>
+      Temukan Kopi Favoritmu
+    </div>
 
-      <div class="col">
-        <div class="card h-100">
-          <img src="{% static 'images/latte.jpg' %}" class="card-img-top" alt="Latte" />
-          <div class="card-body">
-            <h5 class="card-title">Caffe Latte</h5>
-            <p class="card-text">Espresso dengan susu steamed.</p>
-          </div>
-        </div>
-      </div>
+    <!-- Tombol Kategori -->
+    <div class="d-flex justify-content-center mb-4 gap-3">
+      <button class="btn btn-primary btn-sm btn-kategori" data-target="all">Semua</button>
+      <button class="btn btn-outline-primary btn-sm btn-kategori" data-target="coffee">Coffee</button>
+      <button class="btn btn-outline-primary btn-sm btn-kategori" data-target="non-coffee">Non Coffee</button>
+      <button class="btn btn-outline-primary btn-sm btn-kategori" data-target="snack">Snack</button>
+    </div>
 
-      <div class="col">
-        <div class="card h-100">
-          <img src="{% static 'images/cappuccino.jpg' %}" class="card-img-top" alt="Cappuccino" />
-          <div class="card-body">
-            <h5 class="card-title">Cappuccino</h5>
-            <p class="card-text">Perpaduan espresso, susu, dan foam.</p>
+    <!-- Semua menu dikelompokkan per kategori -->
+    {% regroup menus by kategori.nama as grouped_menus %}
+
+    <!-- Section Semua -->
+    <div id="all">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in menus %}
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              {% if item.gambar %}
+                <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
+              {% else %}
+                <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ item.nama }}</h5>
+                <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
+                <small class="text-muted">Kategori: {{ item.kategori.nama }}</small>
+              </div>
+              <div class="card-footer text-end">
+                <strong>Rp {{ item.harga|floatformat:0 }}</strong>
+              </div>
+            </div>
           </div>
-        </div>
+        {% empty %}
+          <p class="info-box">Belum ada menu tersedia.</p>
+        {% endfor %}
       </div>
     </div>
+
+    <!-- Section per Kategori -->
+    {% for group in grouped_menus %}
+      {% with cat_id=group.grouper|slugify %}
+        <h3 id="{{ cat_id }}" class="mt-5 mb-3">{{ group.grouper }}</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+          {% for item in group.list %}
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                {% if item.gambar %}
+                  <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
+                {% else %}
+                  <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.nama }}</h5>
+                  <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
+                </div>
+                <div class="card-footer text-end">
+                  <strong>Rp {{ item.harga|floatformat:0 }}</strong>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endwith %}
+    {% endfor %}
   </div>
+
+  <!-- Scroll script -->
+  <script>
+    document.querySelectorAll('.btn-kategori').forEach((button) => {
+      button.addEventListener('click', () => {
+        // Ganti style tombol aktif
+        document.querySelectorAll('.btn-kategori').forEach((btn) => {
+          btn.classList.remove('btn-primary')
+          btn.classList.add('btn-outline-primary')
+        })
+        button.classList.add('btn-primary')
+        button.classList.remove('btn-outline-primary')
+    
+        const targetId = button.getAttribute('data-target')
+        if (targetId === 'all') {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        } else {
+          const targetSection = document.getElementById(targetId)
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        }
+      })
+    })
+  </script>
 {% endblock %}

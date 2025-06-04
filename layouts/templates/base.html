@@ -11,13 +11,13 @@
     </title>
 
     <!-- CSS Utama -->
-    <link rel="stylesheet" href="{% static 'frontsite/css/navbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    {% block extra_css %}
 
-    <!-- Font Awesome & Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    {% endblock %}
   </head>
-  <body>
+  <body class="{% if request.path == '/home/' %}home{% endif %}">
+    <!-- NAVBAR DI LUAR SCROLL WRAPPER -->
     <nav class="navbar navbar-expand-lg fixed-top shadow">
       <div class="container-fluid px-4">
         <!-- Brand kiri -->
@@ -65,9 +65,10 @@
                 <hr class="dropdown-divider" />
               </li>
               <li>
-                <form method="POST" action="{% url 'logout' %}">
+                <button type="button" class="dropdown-item text-danger" onclick="confirmLogout()">Logout</button>
+
+                <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: none;">
                   {% csrf_token %}
-                  <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</button>
                 </form>
               </li>
             </ul>
@@ -76,13 +77,52 @@
       </div>
     </nav>
 
-    <div class="container mt-5 pt-4">
-      {% block content %}
+    <!-- SCROLL WRAPPER HANYA UNTUK KONTEN -->
+    <div class="scroll-wrapper">
+      <div class="container mt-5 pt-4">
+        {% block content %}
 
-      {% endblock %}
+        {% endblock %}
+      </div>
     </div>
 
-    <!-- Bootstrap JS Bundle (wajib agar dropdown berfungsi) -->
+    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Logout Confirmation -->
+    <script>
+      function confirmLogout() {
+        Swal.fire({
+          title: 'Yakin ingin logout?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#5c4433',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Ya, logout',
+          cancelButtonText: 'Batal'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            document.getElementById('logout-form').submit()
+          }
+        })
+      }
+    </script>
+
+    <!-- SweetAlert2 Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <script>
+          Swal.fire({
+            icon: 'success',
+            title: '{{ message|escapejs }}',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        </script>
+      {% endfor %}
+    {% endif %}
   </body>
 </html>

@@ -11,7 +11,6 @@ def welcome(request):
         return redirect('home')
     return render(request, 'frontsite/welcome.html')
 
-
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -23,6 +22,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            messages.success(request, f'Selamat datang kembali, {user.username}!')
             return redirect('home')
         else:
             messages.error(request, 'Username atau password salah')
@@ -52,7 +52,7 @@ def register_view(request):
         # ⬇ tambahkan email saat create_user
         User.objects.create_user(username=username, password=password1, email=email)
 
-        messages.success(request, 'Registrasi berhasil, silakan login')
+        messages.success(request, 'Akun berhasil dibuat! Silakan login.')
         return redirect('login')
 
     return render(request, 'frontsite/register.html')
@@ -60,6 +60,7 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.success(request, 'Berhasil logout.')
     return redirect('login')
 
 
