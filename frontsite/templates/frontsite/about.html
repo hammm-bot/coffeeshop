@@ -3,65 +3,66 @@
 
 {% block content %}
   <link rel="stylesheet" href="{% static 'frontsite/css/about.css' %}" />
+  <div class="page-container">
+    <!-- ========== SECTION 1 ========== -->
+    <section class="about-section reverse">
+      <div class="about-image">
+        <img src="{% static 'frontsite/images/about1.jpg' %}" alt="Foto Barista" />
+      </div>
+      <div class="about-text">
+        <p class="intro">Halo, kami adalah</p>
+        <h1 class="brand-name">COFFEESHOP</h1>
+        <p class="mission">
+          dan kami percaya bahwa <span class="highlight">secangkir kopi</span>
+          bisa menyatukan <span class="highlight">dunia</span>.
+        </p>
+      </div>
+    </section>
 
-  <!-- ========== SECTION 1 ========== -->
-  <section class="about-section reverse">
-    <div class="about-image">
-      <img src="{% static 'frontsite/images/about1.jpg' %}" alt="Foto Barista" />
-    </div>
-    <div class="about-text">
-      <p class="intro">Halo, kami adalah</p>
-      <h1 class="brand-name">COFFEESHOP</h1>
-      <p class="mission">
-        dan kami percaya bahwa <span class="highlight">secangkir kopi</span>
-        bisa menyatukan <span class="highlight">dunia</span>.
-      </p>
-    </div>
-  </section>
+    <!-- ========== SECTION 2 ========== -->
+    <section class="about-section">
+      <div class="about-image">
+        <img src="{% static 'frontsite/images/about2.jpg' %}" alt="Foto Suasana CoffeeShop" />
+      </div>
+      <div class="about-text">
+        <h2>Cerita Kami</h2>
+        <p>CoffeeShop lahir dari passion kami terhadap kopi lokal berkualitas tinggi. Kami ingin menghadirkan suasana hangat, santai, dan ramah untuk para pecinta kopi.</p>
 
-  <!-- ========== SECTION 2 ========== -->
-  <section class="about-section">
-    <div class="about-image">
-      <img src="{% static 'frontsite/images/about2.jpg' %}" alt="Foto Suasana CoffeeShop" />
-    </div>
-    <div class="about-text">
-      <h2>Cerita Kami</h2>
-      <p>CoffeeShop lahir dari passion kami terhadap kopi lokal berkualitas tinggi. Kami ingin menghadirkan suasana hangat, santai, dan ramah untuk para pecinta kopi.</p>
+        <h2>Visi & Misi</h2>
+        <ul>
+          <li>☕ Menyajikan kopi terbaik dari petani lokal.</li>
+          <li>👨‍👩‍👧‍👦 Menjadi tempat nongkrong yang nyaman dan inklusif.</li>
+          <li>🌱 Mendukung keberlanjutan dan ramah lingkungan.</li>
+        </ul>
+      </div>
+    </section>
 
-      <h2>Visi & Misi</h2>
-      <ul>
-        <li>☕ Menyajikan kopi terbaik dari petani lokal.</li>
-        <li>👨‍👩‍👧‍👦 Menjadi tempat nongkrong yang nyaman dan inklusif.</li>
-        <li>🌱 Mendukung keberlanjutan dan ramah lingkungan.</li>
-      </ul>
-    </div>
-  </section>
+    <!-- ========== SECTION 3 ========== -->
+    <section class="about-section reverse">
+      <div class="about-image">
+        <img src="{% static 'frontsite/images/about3.jpg' %}" alt="Foto Minuman Favorit" />
+      </div>
+      <div class="about-text">
+        <h2>📍 Lokasi Kami</h2>
+        <p>Jl. Kopi No. 7, Samarinda, Kalimantan Timur – buka setiap hari 08.00 – 22.00</p>
 
-  <!-- ========== SECTION 3 ========== -->
-  <section class="about-section reverse">
-    <div class="about-image">
-      <img src="{% static 'frontsite/images/about3.jpg' %}" alt="Foto Minuman Favorit" />
-    </div>
-    <div class="about-text">
-      <h2>📍 Lokasi Kami</h2>
-      <p>Jl. Kopi No. 7, Samarinda, Kalimantan Timur – buka setiap hari 08.00 – 22.00</p>
+        <h2>☕ Best Seller Kami</h2>
+        <ul>
+          <li>✨ Kopi Susu Gula Aren</li>
+          <li>🔥 Espresso Single Origin</li>
+          <li>🍫 Mochaccino Creamy</li>
+          <li>🧊 Es Kopi Pandan Latte</li>
+        </ul>
+      </div>
+    </section>
 
-      <h2>☕ Best Seller Kami</h2>
-      <ul>
-        <li>✨ Kopi Susu Gula Aren</li>
-        <li>🔥 Espresso Single Origin</li>
-        <li>🍫 Mochaccino Creamy</li>
-        <li>🧊 Es Kopi Pandan Latte</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ========== SECTION 4: SOSIAL MEDIA ========== -->
-  <footer class="about-footer">
-    <p>Ikuti kami di:</p>
-    <div class="social-icons">
-      <a href="https://instagram.com/namacoffeeshop" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-      <a href="https://wa.me/6281234567890" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-    </div>
-  </footer>
+    <!-- ========== SECTION 4: SOSIAL MEDIA ========== -->
+    <footer class="about-footer">
+      <p>Ikuti kami di:</p>
+      <div class="social-icons">
+        <a href="https://instagram.com/namacoffeeshop" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="https://wa.me/6281234567890" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      </div>
+    </footer>
+  </div>
 {% endblock %}

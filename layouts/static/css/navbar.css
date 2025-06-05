@@ -7,14 +7,31 @@
   --secondary-color: #bfa88f;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   padding-top: 70px;
   background-color: #f9f5f1;
   font-family: 'Open Sans', sans-serif;
   margin: 0;
+  overflow-x: hidden;
 }
 
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: 70px;
   background-color: var(--primary-color) !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
@@ -146,6 +163,22 @@ body {
 .navbar .container-fluid {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+.scroll-wrapper {
+  height: calc(100vh - 70px); /* Sesuaikan dengan tinggi navbar kamu */
+  overflow-y: auto;
+  padding-bottom: 60px;
+  scrollbar-gutter: stable;
+}
+
+body.home .scroll-wrapper {
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+}
+
+body.home .scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
 }
 
 @media (max-width: 576px) {

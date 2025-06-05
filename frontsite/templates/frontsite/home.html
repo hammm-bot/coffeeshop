@@ -3,27 +3,28 @@
 
 {% block content %}
   <link rel="stylesheet" href="{% static 'frontsite/css/home.css' %}" />
-
-  <!-- Heading tetap di atas -->
-  <div class="page-heading">
-    <h1>Selamat datang, {{ request.user.first_name|default:request.user.username }}!</h1>
-  </div>
-
-  <!-- Layout utama gambar + teks -->
-  <div class="home-layout">
-    <!-- Gambar kiri -->
-    <div class="image-side">
-      <img src="{% static 'frontsite/images/home.jpg' %}" alt="CoffeeShop Banner" />
+  <div class="page-container">
+    <!-- Heading tetap di atas -->
+    <div class="page-heading">
+      <h1>Selamat datang, {{ request.user.first_name|default:request.user.username }}!</h1>
     </div>
 
-    <!-- Konten kanan -->
-    <div class="text-side">
-      <p class="welcome-desc">
-        Terima kasih telah bergabung di <strong>CoffeeShop</strong>. Nikmati kopi terbaik, suasana nyaman, dan layanan hangat setiap saat ☕
-      </p>
-      <div class="button-group">
-        <button class="btn-coffee" disabled>☕ Lihat Menu</button>
-        <button class="btn-coffee-outline" disabled>📦 Buat Pesanan</button>
+    <!-- Layout utama gambar + teks -->
+    <div class="home-layout">
+      <!-- Gambar kiri -->
+      <div class="image-side">
+        <img src="{% static 'frontsite/images/home.jpg' %}" alt="CoffeeShop Banner" />
+      </div>
+
+      <!-- Konten kanan -->
+      <div class="text-side">
+        <p class="welcome-desc">
+          Terima kasih telah bergabung di <strong>CoffeeShop</strong>. Nikmati kopi terbaik, suasana nyaman, dan layanan hangat setiap saat ☕
+        </p>
+        <div class="button-group">
+          <a href="{% url 'menu' %}" class="btn-coffee">☕ Lihat Menu</a>
+          <a href="{% url 'menu' %}" class="btn-coffee-outline">📦 Buat Pesanan</a>
+        </div>
       </div>
     </div>
   </div>

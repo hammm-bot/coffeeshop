@@ -1,8 +1,22 @@
+:root {
+  --primary-color: #5c4433;  /* warna utama coklat kopi */
+  --primary-dark: #3e2a1e;
+  --secondary-color: #bfa88f;
+  --secondary-dark: #a7927a;
+}
+
 body {
   margin: 0;
   background-color: #f9f5f1;
   font-family: 'Segoe UI', sans-serif;
   overflow: hidden;
+}
+
+.page-container {
+  max-width: 1200px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .page-heading {
@@ -64,28 +78,39 @@ body {
   gap: 15px;
 }
 
-.btn-coffee,
-.btn-coffee-outline {
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 1rem;
-  text-decoration: none;
-  border: none;
-  cursor: not-allowed;
-}
-
 .btn-coffee {
-  background-color: #5c4433;
+  background-color: var(--primary-color);
   color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-coffee:hover {
+  background-color: var(--primary-dark); /* warna lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(60, 40, 20, 0.3);
+  cursor: pointer;
 }
 
 .btn-coffee-outline {
-  border: 2px solid #5c4433;
   background-color: transparent;
-  color: #5c4433;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
-.btn-coffee:hover,
 .btn-coffee-outline:hover {
-  opacity: 0.9;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-dark);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(95, 65, 45, 0.2);
+  cursor: pointer;
 }

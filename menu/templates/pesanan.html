@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
   Pesanan - CoffeeShop
 {% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/pesanan.css' %}" />
+{% endblock %}
+
 {% block content %}
-  <div class="mt-5">
-    <h2 class="text-center mb-4">Pesanan Aktif</h2>
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
+  <div class="pesanan-container">
+    <h2 class="text-center mb-4"><i class="fas fa-mug-hot me-2"></i> Pesanan Aktif</h2>
+    <table>
+      <thead>
         <tr>
           <th>No</th>
           <th>Nama Produk</th>
@@ -18,19 +23,19 @@
       </thead>
       <tbody>
         <tr>
-          <td>1</td>
-          <td>Espresso</td>
-          <td>1</td>
-          <td>
-            <span class="badge bg-warning text-dark">Sedang diproses</span>
+          <td data-label="No">1</td>
+          <td data-label="Nama Produk">Espresso</td>
+          <td data-label="Jumlah">1</td>
+          <td data-label="Status">
+            <span class="status-label status-proses">Sedang diproses</span>
           </td>
         </tr>
         <tr>
-          <td>2</td>
-          <td>Latte</td>
-          <td>2</td>
-          <td>
-            <span class="badge bg-success">Selesai</span>
+          <td data-label="No">2</td>
+          <td data-label="Nama Produk">Latte</td>
+          <td data-label="Jumlah">2</td>
+          <td data-label="Status">
+            <span class="status-label status-selesai">Selesai</span>
           </td>
         </tr>
       </tbody>

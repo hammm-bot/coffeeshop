@@ -33,6 +33,7 @@ INSTALLED_APPS = [
 
     'frontsite.apps.FrontsiteConfig',
     'backsite',
+    'menu',
 ]
 
 # ─────────────────────────────────────────────────────────────
@@ -62,7 +63,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            os.path.join(BASE_DIR, 'layouts', 'templates'),
             os.path.join(BASE_DIR, 'frontsite', 'templates'),
+            os.path.join(BASE_DIR, 'menu', 'templates'),
             os.path.join(BASE_DIR, 'backsite', 'templates'),
         ],
         'APP_DIRS': True,
@@ -112,10 +115,13 @@ USE_TZ = False
 # ─────────────────────────────────────────────────────────────
 # 📁 STATIC FILES
 # ─────────────────────────────────────────────────────────────
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'layouts', 'static'),
     os.path.join(BASE_DIR, 'frontsite', 'static'),
     # os.path.join(BASE_DIR, 'backsite', 'static'),
+    os.path.join(BASE_DIR, 'menu', 'static'),
 ]
 
 # ─────────────────────────────────────────────────────────────
