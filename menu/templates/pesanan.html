@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load rupiah %}
 
 {% block title %}
   Pesanan - CoffeeShop
@@ -11,34 +12,53 @@
 
 {% block content %}
   <div class="pesanan-container">
-    <h2 class="text-center mb-4"><i class="fas fa-mug-hot me-2"></i> Pesanan Aktif</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Produk</th>
-          <th>Jumlah</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td data-label="No">1</td>
-          <td data-label="Nama Produk">Espresso</td>
-          <td data-label="Jumlah">1</td>
-          <td data-label="Status">
-            <span class="status-label status-proses">Sedang diproses</span>
-          </td>
-        </tr>
-        <tr>
-          <td data-label="No">2</td>
-          <td data-label="Nama Produk">Latte</td>
-          <td data-label="Jumlah">2</td>
-          <td data-label="Status">
-            <span class="status-label status-selesai">Selesai</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <h2 class="text-center mb-4">
+      <i class="fas fa-mug-hot me-2"></i> Pesanan Aktif
+    </h2>
+
+    {% if orders %}
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Produk</th>
+            <th>Jumlah</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            {% for item in order.items.all %}
+              <tr>
+                <td data-label="No">{{ forloop.parentloop.counter }}</td>
+                <td data-label="Nama Produk">{{ item.menu.nama }}</td>
+                <td data-label="Jumlah">{{ item.jumlah }}</td>
+                <td data-label="Status">
+                  {% if order.status == "diproses" %}
+                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-dark bg-warning-subtle border border-warning">
+                      ⏳ Sedang diproses
+                    </span>
+                  {% elif order.status == "pick up" %}
+                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-primary bg-info-subtle border border-info">
+                      📦 Siap diambil
+                    </span>
+                  {% elif order.status == "selesai" %}
+                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-success bg-success-subtle border border-success">
+                      ✅ Selesai
+                    </span>
+                  {% else %}
+                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-secondary bg-light border border-secondary">
+                      ⏱️ Menunggu
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-center text-muted">Belum ada pesanan aktif.</p>
+    {% endif %}
   </div>
 {% endblock %}

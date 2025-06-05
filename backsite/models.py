@@ -21,15 +21,14 @@ class Menu(models.Model):
 class Order(models.Model):
     STATUS_CHOICES = [
         ('diproses', 'Diproses'),
-        ('dikirim', 'Dikirim'),
+        ('pick up', 'Pick Up'),
         ('selesai', 'Selesai'),
     ]
     METODE_CHOICES = [
-        ('COD', 'COD'),
+        ('Cash', 'Cash'),
         ('E-Wallet', 'E-Wallet'),
-        ('Transfer', 'Transfer'),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_orders')
     metode_pembayaran = models.CharField(max_length=20, choices=METODE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='diproses')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,7 +39,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    jumlah = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.menu.nama} x {self.quantity}"
+        return f"{self.menu.nama} x {self.jumlah}"
