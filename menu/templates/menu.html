@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load rupiah %}
+{% load cart_filters %}
 
 {% block title %}
   Menu Kopi
@@ -18,66 +19,115 @@
     </div>
 
     <!-- Tombol Kategori -->
-    <div class="d-flex justify-content-center mb-4 gap-3">
-      <a href="{% url 'menu' %}?kategori=all" class="btn {% if not kategori_aktif or kategori_aktif == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Semua</a>
-      <a href="?kategori=coffee" class="btn {% if kategori_aktif == 'coffee' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Coffee</a>
-      <a href="?kategori=non-coffee" class="btn {% if kategori_aktif == 'non-coffee' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Non Coffee</a>
-      <a href="?kategori=snack" class="btn {% if kategori_aktif == 'snack' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Snack</a>
+    <div class="d-flex justify-content-center mb-4 gap-3 sticky-top py-3 shadow-sm" style="background-color: #f9f5f1; z-index: 1000;">
+      <a href="#coffee" class="btn btn-kategori btn-outline-primary btn-sm">Coffee</a>
+      <a href="#non-coffee" class="btn btn-kategori btn-outline-primary btn-sm">Non Coffee</a>
+      <a href="#snack" class="btn btn-kategori btn-outline-primary btn-sm">Snack</a>
     </div>
 
-    <!-- Semua menu dikelompokkan per kategori -->
-    {% regroup menus by kategori.nama as grouped_menus %}
-
-    <!-- Section Semua -->
-    <div id="all">
+    <!-- COFFEE -->
+    <div id="coffee" class="pt-5 mt-4">
+      <h4 class="text-center mb-4">Coffee</h4>
       <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for item in menus %}
-          <div class="col">
-            <div class="card h-100 shadow-sm">
-              {% if item.gambar %}
-                <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
-              {% else %}
-                <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
-              {% endif %}
-              <div class="card-body">
-                <h5 class="card-title">{{ item.nama }}</h5>
-                <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
-                <small class="text-muted">Kategori: {{ item.kategori|title }}</small>
-              </div>
-              <div class="card-footer text-end">
-                <strong>{{ item.harga|rupiah }}</strong>
+          {% if item.kategori == 'coffee' %}
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                {% if item.gambar %}
+                  <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
+                {% else %}
+                  <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.nama }}</h5>
+                  <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
+                  <small class="text-muted">Kategori: {{ item.kategori|title }}</small>
+                  <div class="mt-3 d-grid">
+                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKeKeranjang({{ item.id }})">+ Tambah ke Keranjang</button>
+                  </div>
+                </div>
+                <div class="card-footer text-end">
+                  <strong>{{ item.harga|rupiah }}</strong>
+                </div>
               </div>
             </div>
-          </div>
-        {% empty %}
-          <p class="info-box">Belum ada menu tersedia.</p>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- NON COFFEE -->
+    <div id="non-coffee" class="pt-5 mt-4">
+      <h4 class="text-center mb-4">Non Coffee</h4>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in menus %}
+          {% if item.kategori == 'non-coffee' %}
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                {% if item.gambar %}
+                  <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
+                {% else %}
+                  <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.nama }}</h5>
+                  <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
+                  <small class="text-muted">Kategori: {{ item.kategori|title }}</small>
+                  <div class="mt-3 d-grid">
+                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKeKeranjang({{ item.id }})">+ Tambah ke Keranjang</button>
+                  </div>
+                </div>
+                <div class="card-footer text-end">
+                  <strong>{{ item.harga|rupiah }}</strong>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- SNACK -->
+    <div id="snack" class="pt-5 mt-4">
+      <h4 class="text-center mb-4">Snack</h4>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in menus %}
+          {% if item.kategori == 'snack' %}
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                {% if item.gambar %}
+                  <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" />
+                {% else %}
+                  <img src="{% static 'images/default_coffee.jpg' %}" class="card-img-top" alt="Default Coffee" />
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.nama }}</h5>
+                  <p class="card-text">{{ item.deskripsi|truncatewords:15 }}</p>
+                  <small class="text-muted">Kategori: {{ item.kategori|title }}</small>
+                  <div class="mt-3 d-grid">
+                    <button type="button" class="btn btn-success btn-sm" onclick="tambahKeKeranjang({{ item.id }})">+ Tambah ke Keranjang</button>
+                  </div>
+                </div>
+                <div class="card-footer text-end">
+                  <strong>{{ item.harga|rupiah }}</strong>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
     </div>
   </div>
 
-  <!-- Scroll script -->
-  <script>
-    document.querySelectorAll('.btn-kategori').forEach((button) => {
-      button.addEventListener('click', () => {
-        // Ganti style tombol aktif
-        document.querySelectorAll('.btn-kategori').forEach((btn) => {
-          btn.classList.remove('btn-primary')
-          btn.classList.add('btn-outline-primary')
-        })
-        button.classList.add('btn-primary')
-        button.classList.remove('btn-outline-primary')
-    
-        const targetId = button.getAttribute('data-target')
-        if (targetId === 'all') {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        } else {
-          const targetSection = document.getElementById(targetId)
-          if (targetSection) {
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }
-        }
-      })
-    })
-  </script>
+  <!-- Icon Keranjang -->
+  <a href="javascript:void(0);" class="cart-icon" data-bs-toggle="modal" data-bs-target="#cartModal">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">0</span>
+  </a>
+
+  {% include 'cart_modal.html' %}
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'js/cart.js' %}"></script>
+  <script src="{% static 'js/menu.js' %}"></script>
 {% endblock %}

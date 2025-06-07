@@ -119,3 +119,44 @@
     color: #5c4433;
   }
 }
+
+/* =========================
+   STATUS PESANAN BADGE
+========================= */
+.badge-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.badge-status.aktif {
+  background-color: #e0e0e0;
+  color: #5c4433;
+  border: 1px solid #ccc;
+}
+
+.badge-status.proses {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.badge-status.selesai {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.total-harga {
+  text-align: right;
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #5c4433;
+  border-top: 2px solid #ccc;
+  padding-top: 12px;
+}

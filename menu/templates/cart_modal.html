@@ -1,0 +1,56 @@
+<!-- MODAL KERANJANG -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow cart-modern">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel"><i class="fas fa-shopping-cart me-2"></i>Keranjang Belanja</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+
+      <div class="modal-body" id="cart-container">
+        <table class="table align-middle cart-table">
+          <thead class="table-light">
+            <tr>
+              <th>Nama Produk</th>
+              <th class="text-center">Jumlah</th>
+              <th class="text-end">Harga</th>
+              <th class="text-end">Subtotal</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="cart-body">
+            <!-- Diisi lewat JS -->
+          </tbody>
+          <tfoot class="table-light">
+            <tr>
+              <td colspan="3" class="text-end fw-bold">Total</td>
+              <td class="text-end fw-bold" id="cart-total">Rp 0</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <a href="{% url 'checkout' %}" class="btn btn-success btn-checkout">Checkout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/menu.css' %}" />
+{% endblock %}
+
+<!-- Toastify.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Cart Logic -->
+<script src="{% static 'js/cart.js' %}"></script>

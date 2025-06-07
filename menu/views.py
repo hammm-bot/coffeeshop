@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from backsite.models import Menu, Order  # ✅ hanya dari backsite
+from backsite.models import Menu, Order
 from .models import Kategori, Cart, CartItem, RiwayatPemesanan
+from django.db.models import Sum
+from .models import PesananAktif
+
 import json
 
 
@@ -15,19 +18,22 @@ from .models import Kategori, Cart, CartItem, RiwayatPemesanan
 # ─────────────────────────────────────────────────────────────
 # ✅ TAMPILKAN MENU
 # ─────────────────────────────────────────────────────────────
-@login_required
-def menu_view(request):
-    kategori_id = request.GET.get('kategori')
-    kategori_aktif = kategori_id  # kategori_id berupa string: 'coffee', 'non-coffee', dll
 
-    if kategori_id and kategori_id != 'all':
-        menus = Menu.objects.filter(kategori=kategori_id)
-    else:
-        menus = Menu.objects.all()
+def menu_view(request):
+    menus = Menu.objects.all()
+    cart = get_user_cart(request.user)
+    cart_items = cart.items.select_related('menu').all()
+    total = sum(item.menu.harga * item.jumlah for item in cart_items)
+    total_item = cart.items.aggregate(total=Sum('jumlah'))['total'] or 0
+
+    kategori_list = ["coffee", "non-coffee", "snack"]
 
     return render(request, 'menu.html', {
         'menus': menus,
-        'kategori_aktif': kategori_aktif,
+        'kategori_list': kategori_list,
+        'cart_items': cart_items,
+        'total': total,
+        'total_item': total_item,
     })
 
 # ─────────────────────────────────────────────────────────────
@@ -35,8 +41,17 @@ def menu_view(request):
 # ─────────────────────────────────────────────────────────────
 @login_required
 def pesanan_view(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at').prefetch_related('items', 'items__menu')
-    return render(request, 'pesanan.html', {'orders': orders})
+    orders = PesananAktif.objects.filter(user=request.user).exclude(status='selesai').order_by('-tanggal').select_related('menu')
+
+    for o in orders:
+        print(f"ID: {o.id} | Menu: {o.menu} | Nama: {o.menu.nama if o.menu else 'None'}")
+
+    total_harga = orders.aggregate(total=Sum('total'))['total'] or 0
+
+    return render(request, 'pesanan.html', {
+        'orders': orders,
+        'total_harga': total_harga
+    })
 
 # ─────────────────────────────────────────────────────────────
 # ✅ HALAMAN RIWAYAT PEMESANAN
@@ -87,6 +102,7 @@ def view_cart(request):
 
     cart_items = []
     total = 0
+
     for item in items:
         subtotal = item.menu.harga * item.jumlah
         total += subtotal
@@ -98,8 +114,13 @@ def view_cart(request):
             'subtotal': float(subtotal),
         })
 
-    return JsonResponse({'items': cart_items, 'total': float(total)})
+    total_item = cart.items.aggregate(total=Sum('jumlah'))['total'] or 0
 
+    return JsonResponse({
+        'items': cart_items,
+        'total': float(total),
+        'total_item': total_item 
+    })
 
 # ─────────────────────────────────────────────────────────────
 # ✅ UPDATE JUMLAH ITEM DI KERANJANG
@@ -139,16 +160,18 @@ def checkout(request):
     cart = get_user_cart(request.user)
     items = cart.items.select_related('menu').all()
 
-    # Simpan sebagai riwayat pemesanan
     for item in items:
-        RiwayatPemesanan.objects.create(
+        PesananAktif.objects.create(
             user=request.user,
-            nama_produk=item.menu.nama,
+            menu=item.menu,  # Tambahkan ini agar relasi menu terisi
             jumlah=item.jumlah,
+            harga=item.menu.harga,
             total=item.menu.harga * item.jumlah,
+            status='proses'
         )
 
+    cart.items.all().delete()
     cart.is_active = False
     cart.save()
 
-    return redirect('history')
+    return redirect('pesanan')
