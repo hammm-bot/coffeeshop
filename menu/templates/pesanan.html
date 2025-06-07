@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load rupiah %}
+{% load humanize %}
 
 {% block title %}
   Pesanan - CoffeeShop
@@ -12,51 +12,61 @@
 
 {% block content %}
   <div class="pesanan-container">
-    <h2 class="text-center mb-4">
-      <i class="fas fa-mug-hot me-2"></i> Pesanan Aktif
-    </h2>
+    <h2 class="text-center mb-4"><i class="fas fa-mug-hot me-2"></i> Pesanan Aktif</h2>
 
     {% if orders %}
       <table>
         <thead>
           <tr>
             <th>No</th>
+            <th>Foto</th>
             <th>Nama Produk</th>
             <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Subtotal</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {% for order in orders %}
-            {% for item in order.items.all %}
-              <tr>
-                <td data-label="No">{{ forloop.parentloop.counter }}</td>
-                <td data-label="Nama Produk">{{ item.menu.nama }}</td>
-                <td data-label="Jumlah">{{ item.jumlah }}</td>
-                <td data-label="Status">
-                  {% if order.status == "diproses" %}
-                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-dark bg-warning-subtle border border-warning">
-                      ⏳ Sedang diproses
-                    </span>
-                  {% elif order.status == "pick up" %}
-                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-primary bg-info-subtle border border-info">
-                      📦 Siap diambil
-                    </span>
-                  {% elif order.status == "selesai" %}
-                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-success bg-success-subtle border border-success">
-                      ✅ Selesai
-                    </span>
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                {% if order.menu %}
+                  {% if order.menu.gambar %}
+                    <img src="{{ order.menu.gambar.url }}" alt="{{ order.menu.nama }}" style="max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px;" />
                   {% else %}
-                    <span class="badge rounded-pill px-3 py-2 fw-semibold text-secondary bg-light border border-secondary">
-                      ⏱️ Menunggu
-                    </span>
+                    Tidak ada foto
                   {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
+                {% else %}
+                  (Menu tidak tersedia)
+                {% endif %}
+              </td>
+              <td>
+                {% if order.menu %}
+                  {{ order.menu.nama }}
+                {% else %}
+                  (Menu tidak tersedia)
+                {% endif %}
+              </td>
+              <td>{{ order.jumlah }}</td>
+              <td>Rp {{ order.harga|intcomma }}</td>
+              <td>Rp {{ order.total|intcomma }}</td>
+              <td>
+                {% if order.status == 'proses' %}
+                  <span class="badge-status proses">⏳ Sedang diproses</span>
+                {% elif order.status == 'selesai' %}
+                  <span class="badge-status selesai">✅ Selesai</span>
+                {% else %}
+                  <span class="badge-status aktif">⏱️ Menunggu</span>
+                {% endif %}
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
+
+      <div class="text-end total-harga">Total Keseluruhan: Rp {{ total_harga|intcomma }}</div>
     {% else %}
       <p class="text-center text-muted">Belum ada pesanan aktif.</p>
     {% endif %}
