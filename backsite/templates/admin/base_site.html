@@ -1,16 +1,12 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}CoffeeShop Admin{% endblock %}
-
 {% block branding %}
-<h1 id="site-name">
-  <a href="{% url 'admin:index' %}">CoffeeShop Admin</a>
-</h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Admin Coffee Shop</a></h1>
 {% endblock %}
 
-{% block nav-global %}
-<ul class="nav-global">
-  <li><a href="{% url 'admin-dashboard' %}" target="_blank">📊 Lihat Grafik</a></li>
-</ul>
+{% block usertools %}
+{{ block.super }}
+|
+<a href="{% url 'admin-dashboard' %}">📊 Lihat Grafik</a>
 {% endblock %}
