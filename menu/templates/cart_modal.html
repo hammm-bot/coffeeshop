@@ -1,3 +1,6 @@
+{% load static %}
+{% load humanize %}
+
 <!-- MODAL KERANJANG -->
 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -19,7 +22,7 @@
             </tr>
           </thead>
           <tbody id="cart-body">
-            <!-- Diisi lewat JS -->
+            <!-- Data keranjang diisi lewat JS -->
           </tbody>
           <tfoot class="table-light">
             <tr>
@@ -29,17 +32,20 @@
             </tr>
           </tfoot>
         </table>
+
+        <!-- Tempat QR code & form pembayaran -->
+        <div id="qrcode-payment-section" class="mt-4 text-center">
+          <!-- Awalnya kosong, akan diisi setelah checkout -->
+        </div>
       </div>
 
       <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        <a href="{% url 'menu:checkout' %}" class="btn btn-success btn-checkout">Checkout</a>
+        <button id="btnCheckout" type="button" class="btn btn-success btn-checkout">Checkout</button>
       </div>
     </div>
   </div>
 </div>
-
-{% load static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/menu.css' %}" />

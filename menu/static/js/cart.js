@@ -162,4 +162,67 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cartModal) {
     cartModal.addEventListener('shown.bs.modal', loadCart);
   }
+
+  // Tambahkan event listener tombol Checkout
+  const btnCheckout = document.getElementById('btnCheckout');
+  if (btnCheckout) {
+    btnCheckout.addEventListener('click', function() {
+      fetch("/menu/checkout/", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Sembunyikan tombol checkout
+          btnCheckout.style.display = 'none';
+
+          // Isi QR code & form di modal
+          const qrSection = document.getElementById('qrcode-payment-section');
+          if(qrSection) {
+            qrSection.innerHTML = data.html_qrcode_form;
+          }
+
+          Toastify({
+            text: "Checkout berhasil, silakan lanjutkan pembayaran",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+          }).showToast();
+        } else {
+          alert(data.message || 'Checkout gagal.');
+        }
+      })
+      .catch(() => {
+        Toastify({
+          text: "Terjadi kesalahan saat checkout",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336",
+        }).showToast();
+      });
+    });
+  }
+
+  // Fungsi dapatkan csrf token dari cookie (pastikan ada satu saja fungsi ini di file)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 });
