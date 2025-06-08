@@ -1,13 +1,14 @@
-from django.shortcuts import render
+from menu.models import PesananAktif
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Sum
 from django.utils.timezone import now
-from .models import Order
 from django.db.models.functions import TruncMonth
-import csv
 from django.http import HttpResponse
+import csv
+
+from menu.models import PesananAktif  # Ganti dengan model baru
 
 # Cek apakah user adalah admin/staff
 def is_admin(user):
@@ -19,13 +20,13 @@ def dashboard_view(request):
     today = now().date()
     month = now().month
 
-    total_hari_ini = Order.objects.filter(created_at__date=today).count()
-    total_bulan_ini = Order.objects.filter(created_at__month=month).count()
-    total_transaksi = Order.objects.count()
+    total_hari_ini = PesananAktif.objects.filter(tanggal__date=today).count()
+    total_bulan_ini = PesananAktif.objects.filter(tanggal__month=month).count()
+    total_transaksi = PesananAktif.objects.count()
 
     # Ambil data penjualan per bulan (6 bulan terakhir)
     monthly_data = (
-        Order.objects.annotate(month=TruncMonth('created_at'))
+        PesananAktif.objects.annotate(month=TruncMonth('tanggal'))
         .values('month')
         .annotate(jumlah=Count('id'))
         .order_by('month')
@@ -44,14 +45,23 @@ def dashboard_view(request):
 
     return render(request, 'backsite/dashboard.html', context)
 
+@login_required
+@user_passes_test(is_admin)
 def export_transaksi_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="laporan_transaksi.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['ID Order', 'User', 'Tanggal', 'Status', 'Metode Pembayaran'])
+    writer.writerow(['ID Pesanan', 'User', 'Menu', 'Tanggal', 'Status', 'Total'])
 
-    for order in Order.objects.all():
-        writer.writerow([order.id, order.user.username, order.created_at.strftime('%Y-%m-%d'), order.status, order.metode_pembayaran])
+    for pesanan in PesananAktif.objects.all():
+        writer.writerow([
+            pesanan.id,
+            pesanan.user.username,
+            pesanan.menu.nama if pesanan.menu else '–',
+            pesanan.tanggal.strftime('%Y-%m-%d'),
+            pesanan.get_status_display(),
+            f"{pesanan.total:.2f}",
+        ])
 
     return response

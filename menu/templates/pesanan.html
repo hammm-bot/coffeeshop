@@ -32,23 +32,13 @@
             <tr>
               <td>{{ forloop.counter }}</td>
               <td>
-                {% if order.menu %}
-                  {% if order.menu.gambar %}
-                    <img src="{{ order.menu.gambar.url }}" alt="{{ order.menu.nama }}" style="max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px;" />
-                  {% else %}
-                    Tidak ada foto
-                  {% endif %}
+                {% if order.menu and order.menu.gambar %}
+                  <img src="{{ order.menu.gambar.url }}" alt="{{ order.menu.nama }}" style="max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px;" />
                 {% else %}
-                  (Menu tidak tersedia)
+                  Tidak ada foto
                 {% endif %}
               </td>
-              <td>
-                {% if order.menu %}
-                  {{ order.menu.nama }}
-                {% else %}
-                  (Menu tidak tersedia)
-                {% endif %}
-              </td>
+              <td>{{ order.menu.nama|default:"(Menu tidak tersedia)" }}</td>
               <td>{{ order.jumlah }}</td>
               <td>Rp {{ order.harga|intcomma }}</td>
               <td>Rp {{ order.total|intcomma }}</td>
@@ -71,4 +61,39 @@
       <p class="text-center text-muted">Belum ada pesanan aktif.</p>
     {% endif %}
   </div>
+
+  <hr class="my-5" />
+
+  <h4 class="text-center">Konfirmasi Pembayaran</h4>
+
+  {% if transaksi %}
+    <div class="text-center">
+      <p>Total Pembayaran: <strong>Rp {{ transaksi.total|intcomma }}</strong></p>
+
+      {% if transaksi.bukti_pembayaran %}
+        <img src="{{ transaksi.bukti_pembayaran.url }}" alt="Bukti Pembayaran" style="max-height: 200px;"><br><br>
+      {% else %}
+        <img src="{% static 'images/qr_dana.png' %}" alt="QR DANA" style="width: 200px;"><br>
+        <p class="mt-2">Transfer ke DANA <strong>082251409098</strong>, lalu upload bukti di bawah:</p>
+
+        <form method="post" enctype="multipart/form-data" class="d-inline-block mt-3 text-start">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-success mt-2">Kirim Bukti</button>
+        </form>
+      {% endif %}
+
+      <div class="mt-3">
+        {% if transaksi.status == 'verifikasi' %}
+          <div class="badge bg-warning text-dark">🟡 Menunggu Verifikasi Admin</div>
+        {% elif transaksi.status == 'disetujui' %}
+          <div class="badge bg-success">✅ Pembayaran Disetujui</div>
+        {% elif transaksi.status == 'ditolak' %}
+          <div class="badge bg-danger">❌ Pembayaran Ditolak</div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <p class="text-center text-muted">Belum ada transaksi yang bisa dibayar.</p>
+  {% endif %}
 {% endblock %}

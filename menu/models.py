@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth.models import User 
 from backsite.models import Menu
+from io import BytesIO
+from django.core.files.base import ContentFile
+import qrcode
 
 class Kategori(models.Model):
     nama = models.CharField(max_length=100)
@@ -13,6 +15,9 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"Cart {self.id} - {self.user.username}"
+
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
@@ -21,28 +26,28 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.menu.harga * self.jumlah
 
+    def __str__(self):
+        return f"{self.menu.nama} x {self.jumlah}"
+
 class RiwayatPemesanan(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     nama_produk = models.CharField(max_length=100)
     jumlah = models.PositiveIntegerField()
-    total = models.DecimalField(max_digits=10, decimal_places=2)  # <- disarankan ditambahkan
+    total = models.DecimalField(max_digits=10, decimal_places=2)
     tanggal = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.nama_produk} ({self.jumlah}) - {self.user.username}"
-    
-from django.db import models
-from django.contrib.auth.models import User
 
 class PesananAktif(models.Model):
     STATUS_CHOICES = [
-        ('aktif', 'Menunggu Konfirmasi'),
         ('proses', 'Diproses'),
+        ('pickup', 'Siap Diambil'),
         ('selesai', 'Selesai'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, null=True, blank=True)  # tambah relasi ini
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, null=True, blank=True)
     jumlah = models.PositiveIntegerField()
     harga = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -50,9 +55,71 @@ class PesananAktif(models.Model):
     tanggal = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.harga = self.menu.harga
-        self.total = self.harga * self.jumlah
+        # Cek apakah objek ini sudah ada di database
+        if self.pk:
+            previous = PesananAktif.objects.get(pk=self.pk)
+        else:
+            previous = None
+
+        # Hitung ulang harga dan total
+        if self.menu:
+            self.harga = self.menu.harga
+            self.total = self.harga * self.jumlah
+
         super().save(*args, **kwargs)
 
+        # Setelah disimpan, jika status berubah menjadi 'selesai', pindahkan ke Riwayat
+        if self.status == 'selesai':
+            # Cegah duplikat jika sebelumnya sudah 'selesai'
+            if not previous or previous.status != 'selesai':
+                from .models import RiwayatPemesanan
+                RiwayatPemesanan.objects.create(
+                    user=self.user,
+                    nama_produk=self.menu.nama if self.menu else 'Tanpa Nama',
+                    jumlah=self.jumlah,
+                    total=self.total,
+                )
+                # Opsional: Hapus dari PesananAktif
+                self.delete()
+
     def __str__(self):
-        return f"{self.menu.nama} ({self.status}) - {self.user.username}"
+        return f"{self.menu.nama if self.menu else 'Tanpa Menu'} ({self.status}) - {self.user.username}"
+
+class TransaksiManual(models.Model):
+    STATUS_CHOICES = [
+        ('verifikasi', 'Menunggu Verifikasi'),
+        ('disetujui', 'Disetujui'),
+        ('ditolak', 'Ditolak'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    bukti_pembayaran = models.ImageField(upload_to='bukti_pembayaran/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        from .models import Cart, CartItem, PesananAktif  # hindari circular import
+
+        is_newly_approved = False
+        if self.pk:
+            old = TransaksiManual.objects.get(pk=self.pk)
+            if old.status != 'disetujui' and self.status == 'disetujui':
+                is_newly_approved = True
+
+        super().save(*args, **kwargs)
+
+        if is_newly_approved:
+            cart = Cart.objects.filter(user=self.user, is_active=True).first()
+            if cart:
+                for item in cart.items.all():
+                    PesananAktif.objects.create(
+                        user=self.user,
+                        menu=item.menu,
+                        jumlah=item.jumlah,
+                        harga=item.menu.harga,
+                        total=item.menu.harga * item.jumlah,
+                        status='aktif'
+                    )
+                cart.is_active = False
+                cart.save()

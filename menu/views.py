@@ -2,11 +2,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from backsite.models import Menu, Order
+from backsite.models import Menu
 from .models import Kategori, Cart, CartItem, RiwayatPemesanan
 from django.db.models import Sum
 from .models import PesananAktif
-
+from django.shortcuts import render, redirect
+from .models import TransaksiManual
+from .forms import BuktiPembayaranForm
+from .models import Cart, CartItem, TransaksiManual
+from .forms import BuktiPembayaranForm
+from django.db.models import F, Sum
+from django.shortcuts import render, redirect
 import json
 
 
@@ -42,6 +48,8 @@ def menu_view(request):
 @login_required
 def pesanan_view(request):
     orders = PesananAktif.objects.filter(user=request.user).exclude(status='selesai').order_by('-tanggal').select_related('menu')
+    
+    transaksi = TransaksiManual.objects.filter(user=request.user).order_by('-created_at').first()
 
     for o in orders:
         print(f"ID: {o.id} | Menu: {o.menu} | Nama: {o.menu.nama if o.menu else 'None'}")
@@ -175,3 +183,50 @@ def checkout(request):
     cart.save()
 
     return redirect('pesanan')
+
+
+def checkout_view(request):
+    cart = Cart.objects.filter(user=request.user, is_active=True).first()
+    
+    # Jika cart kosong
+    if not cart or not cart.items.exists():
+        return render(request, 'pesanan.html', {
+            'orders': [],
+            'total_harga': 0,
+            'transaksi': None,
+            'form': None
+        })
+
+    # Hitung total dari cart
+    total = cart.items.aggregate(
+        total=Sum(F('menu__harga') * F('jumlah'))
+    )['total'] or 0
+
+    # Buat transaksi baru atau ambil yang pending
+    transaksi, created = TransaksiManual.objects.get_or_create(
+        user=request.user,
+        status='pending',
+        defaults={'total': total}
+    )
+
+    # Update total jika cart berubah
+    if not created:
+        transaksi.total = total
+        transaksi.save()
+
+    # Form upload
+    if request.method == 'POST':
+        form = BuktiPembayaranForm(request.POST, request.FILES, instance=transaksi)
+        if form.is_valid():
+            transaksi.status = 'verifikasi'
+            form.save()
+            return redirect('menu:pesanan')
+    else:
+        form = BuktiPembayaranForm(instance=transaksi)
+
+    return render(request, 'pesanan.html', {
+        'orders': [],  # jika belum generate PesananAktif
+        'total_harga': 0,
+        'transaksi': transaksi,
+        'form': form
+    })

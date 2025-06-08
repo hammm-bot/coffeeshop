@@ -17,29 +17,3 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.nama
-
-class Order(models.Model):
-    STATUS_CHOICES = [
-        ('diproses', 'Diproses'),
-        ('pick up', 'Pick Up'),
-        ('selesai', 'Selesai'),
-    ]
-    METODE_CHOICES = [
-        ('Cash', 'Cash'),
-        ('E-Wallet', 'E-Wallet'),
-    ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_orders')
-    metode_pembayaran = models.CharField(max_length=20, choices=METODE_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='diproses')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Order #{self.pk} by {self.user.username}"
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    jumlah = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.menu.nama} x {self.jumlah}"
