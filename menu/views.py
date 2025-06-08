@@ -16,12 +16,14 @@ from django.db.models import F, Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
 import json
-
+from django.views.decorators.csrf import csrf_exempt
 
 import json
 
 from backsite.models import Menu
 from .models import Kategori, Cart, CartItem, RiwayatPemesanan
+from django.views.decorators.http import require_POST
+from .forms import BuktiPembayaranForm
 
 # ─────────────────────────────────────────────────────────────
 # ✅ TAMPILKAN MENU
@@ -35,28 +37,12 @@ def menu_view(request):
     total = sum(item.menu.harga * item.jumlah for item in cart_items)
     total_item = cart.items.aggregate(total=Sum('jumlah'))['total'] or 0
 
-    # Ambil transaksi manual user, kecuali status pending
-    transaksi = TransaksiManual.objects.filter(user=request.user).order_by('-created_at').first()
-
-    form = None
-    if transaksi:
-        if request.method == 'POST':
-            form = BuktiPembayaranForm(request.POST, request.FILES, instance=transaksi)
-            if form.is_valid():
-                transaksi.status = 'verifikasi'
-                form.save()
-                return redirect('menu')
-        else:
-            form = BuktiPembayaranForm(instance=transaksi)
-
     context = {
         'menus': menus,
         'kategori_list': ["coffee", "non-coffee", "snack"],
         'cart_items': cart_items,
         'total': total,
         'total_item': total_item,
-        'transaksi': transaksi,
-        'form': form,
     }
     return render(request, 'menu.html', context)
 # ─────────────────────────────────────────────────────────────
@@ -181,6 +167,8 @@ def delete_cart_item(request, item_id):
 # ─────────────────────────────────────────────────────────────
 # ✅ PROSES CHECKOUT
 # ─────────────────────────────────────────────────────────────
+from .forms import BuktiPembayaranForm
+
 @login_required
 def checkout(request):
     if request.method == 'POST':
@@ -192,70 +180,13 @@ def checkout(request):
 
         total = sum(item.menu.harga * item.jumlah for item in items)
 
-        # Ganti get_or_create dengan filter + create manual
-        transaksi = TransaksiManual.objects.filter(user=request.user, status='pending').order_by('-created_at').first()
-        if not transaksi:
-            transaksi = TransaksiManual.objects.create(user=request.user, status='pending', total=total)
-        else:
-            transaksi.total = total
-            transaksi.save()
-
-        create_pesanan_aktif_from_cart(request.user)
-
         html_qrcode_form = render_to_string('partial_qrcode_form.html', {
-            'transaksi': transaksi,
-            'form': BuktiPembayaranForm(instance=transaksi)
+            'total': total
         }, request=request)
 
         return JsonResponse({'status': 'success', 'html_qrcode_form': html_qrcode_form})
-
-    return JsonResponse({'status': 'error', 'message': 'Method not allowed.'})
-
-def checkout_view(request):
-    cart = Cart.objects.filter(user=request.user, is_active=True).first()
     
-    # Jika cart kosong
-    if not cart or not cart.items.exists():
-        return render(request, 'pesanan.html', {
-            'orders': [],
-            'total_harga': 0,
-            'transaksi': None,
-            'form': None
-        })
-
-    # Hitung total dari cart
-    total = cart.items.aggregate(
-        total=Sum(F('menu__harga') * F('jumlah'))
-    )['total'] or 0
-
-    # Buat transaksi baru atau ambil yang pending
-    transaksi, created = TransaksiManual.objects.get_or_create(
-        user=request.user,
-        status='pending',
-        defaults={'total': total}
-    )
-
-    # Update total jika cart berubah
-    if not created:
-        transaksi.total = total
-        transaksi.save()
-
-    # Form upload
-    if request.method == 'POST':
-        form = BuktiPembayaranForm(request.POST, request.FILES, instance=transaksi)
-        if form.is_valid():
-            transaksi.status = 'verifikasi'
-            form.save()
-            return redirect('menu:pesanan')
-    else:
-        form = BuktiPembayaranForm(instance=transaksi)
-
-    return render(request, 'pesanan.html', {
-        'orders': [],  # jika belum generate PesananAktif
-        'total_harga': 0,
-        'transaksi': transaksi,
-        'form': form
-    })
+    return JsonResponse({'status': 'error', 'message': 'Method not allowed.'})
     
 def create_pesanan_aktif_from_cart(user):
     cart = Cart.objects.filter(user=user, is_active=True).first()
@@ -267,30 +198,85 @@ def create_pesanan_aktif_from_cart(user):
             user=user,
             menu=item.menu,
             jumlah=item.jumlah,
-            status='proses',  # default status, sesuaikan dengan pilihanmu
-            # harga dan total akan otomatis dihitung di method save()
-            tanggal=timezone.now(),  # opsional, karena auto_now_add
+            status='menunggu',
+            tanggal=timezone.now(),
         )
     # Tandai cart sudah tidak aktif dan hapus item cart
     cart.is_active = False
     cart.save()
     items.delete()
     
+@require_POST
 @login_required
+def confirm_payment(request):
+    user = request.user
+
+    try:
+        # Ambil transaksi terakhir milik user
+        transaksi = TransaksiManual.objects.filter(user=user).latest('created_at')
+    except TransaksiManual.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Transaksi tidak ditemukan'})
+
+    # ✅ Validasi wajib: Pastikan sudah upload bukti pembayaran
+    if not transaksi.bukti_pembayaran:
+        return JsonResponse({'status': 'error', 'message': 'Harap upload bukti pembayaran terlebih dahulu'})
+
+    # ✅ Tandai transaksi diproses
+    transaksi.status = 'diproses'
+    transaksi.save()
+
+    # ✅ Buat pesanan dari cart (jika belum pernah dibuat)
+    cart = Cart.objects.filter(user=user, is_active=True).first()
+    if cart:
+        items = cart.items.select_related('menu').all()
+        for item in items:
+            PesananAktif.objects.create(
+                user=user,
+                menu=item.menu,
+                jumlah=item.jumlah,
+                status='menunggu',
+                tanggal=timezone.now()
+            )
+        # Tandai cart tidak aktif & bersihkan
+        cart.is_active = False
+        cart.save()
+        items.delete()
+
+    return JsonResponse({'status': 'success'})
+
+@require_POST
+@login_required
+@csrf_exempt
 def upload_bukti(request):
-    if request.method == 'POST':
-        transaksi = TransaksiManual.objects.filter(user=request.user).order_by('-created_at').last()
-        if not transaksi:
-            return JsonResponse({'status': 'error', 'message': 'Transaksi tidak ditemukan.'})
+    if not request.FILES.get('bukti_pembayaran'):
+        return JsonResponse({'status': 'error', 'message': 'File tidak ditemukan'})
 
-        form = BuktiPembayaranForm(request.POST, request.FILES, instance=transaksi)
-        if form.is_valid():
-            transaksi.status = 'verifikasi'
-            form.save()
-            return JsonResponse({'status': 'success'})
-        else:
-            print("Form errors:", form.errors)
-            error_messages = "; ".join([f"{field}: {', '.join(errors)}" for field, errors in form.errors.items()])
-            return JsonResponse({'status': 'error', 'message': error_messages})
+    cart = get_user_cart(request.user)
+    items = cart.items.select_related('menu').all()
 
-    return JsonResponse({'status': 'error', 'message': 'Method tidak diizinkan.'})
+    if not items.exists():
+        return JsonResponse({'status': 'error', 'message': 'Keranjang kosong.'})
+
+    total = sum(item.menu.harga * item.jumlah for item in items)
+
+    # Simpan transaksi manual
+    transaksi = TransaksiManual.objects.create(
+        user=request.user,
+        total=total,
+        status='verifikasi',
+        bukti_pembayaran=request.FILES['bukti_pembayaran']
+    )
+
+    # Simpan item ke PesananAktif
+    for item in items:
+        PesananAktif.objects.create(
+            user=request.user,
+            menu=item.menu,
+            jumlah=item.jumlah,
+            status='menunggu',  # atau status default kamu
+        )
+
+    # Kosongkan cart
+    cart.items.all().delete()
+
+    return JsonResponse({'status': 'success'})

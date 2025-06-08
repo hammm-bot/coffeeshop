@@ -41,45 +41,44 @@ class RiwayatPemesanan(models.Model):
 
 class PesananAktif(models.Model):
     STATUS_CHOICES = [
-        ('proses', 'Diproses'),
-        ('pickup', 'Siap Diambil'),
+        ('menunggu', 'Menunggu Konfirmasi'),
+        ('diproses', 'Diproses'),
+        ('siap', 'Siap di Pickup'),
         ('selesai', 'Selesai'),
     ]
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='menunggu')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE, null=True, blank=True)
     jumlah = models.PositiveIntegerField()
     harga = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='aktif')
     tanggal = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Cek apakah objek ini sudah ada di database
+        # Ambil versi lama sebelum disimpan (untuk deteksi perubahan status)
         if self.pk:
             previous = PesananAktif.objects.get(pk=self.pk)
         else:
             previous = None
 
-        # Hitung ulang harga dan total
+        # Hitung ulang total
         if self.menu:
             self.harga = self.menu.harga
             self.total = self.harga * self.jumlah
 
         super().save(*args, **kwargs)
 
-        # Setelah disimpan, jika status berubah menjadi 'selesai', pindahkan ke Riwayat
+        # Jika status berganti ke selesai, pindah ke riwayat
         if self.status == 'selesai':
-            # Cegah duplikat jika sebelumnya sudah 'selesai'
             if not previous or previous.status != 'selesai':
-                from .models import RiwayatPemesanan
                 RiwayatPemesanan.objects.create(
                     user=self.user,
                     nama_produk=self.menu.nama if self.menu else 'Tanpa Nama',
                     jumlah=self.jumlah,
                     total=self.total,
                 )
-                # Opsional: Hapus dari PesananAktif
                 self.delete()
 
     def __str__(self):

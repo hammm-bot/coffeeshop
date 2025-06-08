@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load rupiah %}
 
 {% block title %}
   Pesanan - CoffeeShop
@@ -11,54 +12,58 @@
 {% endblock %}
 
 {% block content %}
-  <div class="pesanan-container">
-    <h2 class="text-center mb-4"><i class="fas fa-mug-hot me-2"></i> Pesanan Aktif</h2>
+<div class="pesanan-container">
+  <h2 class="text-center mb-4"><i class="fas fa-mug-hot me-2"></i> Pesanan Aktif</h2>
 
-    {% if orders %}
-      <table>
-        <thead>
+  {% if orders %}
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Foto</th>
+          <th>Nama Produk</th>
+          <th>Jumlah</th>
+          <th>Harga</th>
+          <th>Subtotal</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
           <tr>
-            <th>No</th>
-            <th>Foto</th>
-            <th>Nama Produk</th>
-            <th>Jumlah</th>
-            <th>Harga</th>
-            <th>Subtotal</th>
-            <th>Status</th>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              {% if order.menu and order.menu.gambar %}
+                <img src="{{ order.menu.gambar.url }}" alt="{{ order.menu.nama }}" style="max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px;" />
+              {% else %}
+                Tidak ada foto
+              {% endif %}
+            </td>
+            <td>{{ order.menu.nama|default:"(Menu tidak tersedia)" }}</td>
+            <td>{{ order.jumlah }}</td>
+            <td>{{ order.harga|rupiah }}</td>
+            <td>{{ order.total|rupiah }}</td>
+            <td>
+              {% if order.status == 'menunggu' %}
+                <span class="badge-status menunggu">⏱️ Menunggu Konfirmasi</span>
+              {% elif order.status == 'diproses' %}
+                <span class="badge-status proses">🔧 Sedang Diproses</span>
+              {% elif order.status == 'siap' %}
+                <span class="badge-status siap">📦 Siap di Pickup</span>
+              {% elif order.status == 'selesai' %}
+                <span class="badge-status selesai">✅ Selesai</span>
+              {% else %}
+                <span class="badge-status">❓ Tidak Diketahui</span>
+              {% endif %}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {% for order in orders %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>
-                {% if order.menu and order.menu.gambar %}
-                  <img src="{{ order.menu.gambar.url }}" alt="{{ order.menu.nama }}" style="max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px;" />
-                {% else %}
-                  Tidak ada foto
-                {% endif %}
-              </td>
-              <td>{{ order.menu.nama|default:"(Menu tidak tersedia)" }}</td>
-              <td>{{ order.jumlah }}</td>
-              <td>Rp {{ order.harga|intcomma }}</td>
-              <td>Rp {{ order.total|intcomma }}</td>
-              <td>
-                {% if order.status == 'proses' %}
-                  <span class="badge-status proses">⏳ Sedang diproses</span>
-                {% elif order.status == 'selesai' %}
-                  <span class="badge-status selesai">✅ Selesai</span>
-                {% else %}
-                  <span class="badge-status aktif">⏱️ Menunggu</span>
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        {% endfor %}
+      </tbody>
+    </table>
 
-      <div class="text-end total-harga">Total Keseluruhan: Rp {{ total_harga|intcomma }}</div>
-    {% else %}
-      <p class="text-center text-muted">Belum ada pesanan aktif.</p>
-    {% endif %}
-  </div>
+    <div class="text-end total-harga">Total Keseluruhan: {{ total_harga|rupiah }}</div>
+  {% else %}
+    <p class="text-center text-muted">Belum ada pesanan aktif.</p>
+  {% endif %}
+</div>
 {% endblock %}

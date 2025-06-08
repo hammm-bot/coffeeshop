@@ -2,18 +2,13 @@
 // Requires: Toastify.js & SweetAlert2 already loaded
 
 function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + '=') {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  for (let cookie of cookies) {
+    if (cookie.startsWith(name + '=')) {
+      return decodeURIComponent(cookie.split('=')[1]);
     }
   }
-  return cookieValue;
+  return null;
 }
 
 function updateCartIcon() {
@@ -31,7 +26,6 @@ function loadCart() {
       const tbody = document.getElementById('cart-body');
       const totalEl = document.getElementById('cart-total');
       const container = document.getElementById('cart-container');
-
       if (!tbody || !totalEl || !container) return;
 
       if (data.items.length === 0) {
@@ -76,26 +70,19 @@ function tambahKeKeranjang(menuId) {
     },
     body: JSON.stringify({ jumlah: 1 })
   })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
+      Toastify({
+        text: data.status === 'success' ? "✅ Menu berhasil ditambahkan" : "❌ Gagal menambahkan ke keranjang",
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: data.status === 'success' ? "#4caf50" : "#f44336"
+      }).showToast();
+
       if (data.status === 'success') {
-        Toastify({
-          text: "✅ Menu berhasil ditambahkan ke keranjang",
-          duration: 2000,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#4caf50"
-        }).showToast();
         updateCartIcon();
         loadCart();
-      } else {
-        Toastify({
-          text: "❌ Gagal menambahkan ke keranjang",
-          duration: 2000,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#f44336"
-        }).showToast();
       }
     })
     .catch(() => {
@@ -121,7 +108,7 @@ function hapusPesanan(itemId) {
     .then(data => {
       if (data.status === 'success') {
         Toastify({
-          text: "🗑️ Item berhasil dihapus dari keranjang",
+          text: "🗑️ Item dihapus",
           duration: 2000,
           gravity: "top",
           position: "right",
@@ -134,10 +121,7 @@ function hapusPesanan(itemId) {
 }
 
 function ubahJumlah(itemId, jumlahBaru) {
-  if (jumlahBaru < 1) {
-    hapusPesanan(itemId);
-    return;
-  }
+  if (jumlahBaru < 1) return hapusPesanan(itemId);
 
   fetch(`/menu/cart/update/${itemId}/`, {
     method: 'POST',
@@ -158,15 +142,15 @@ function ubahJumlah(itemId, jumlahBaru) {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateCartIcon();
+
   const cartModal = document.getElementById('cartModal');
   if (cartModal) {
     cartModal.addEventListener('shown.bs.modal', loadCart);
   }
 
-  // Tambahkan event listener tombol Checkout
   const btnCheckout = document.getElementById('btnCheckout');
   if (btnCheckout) {
-    btnCheckout.addEventListener('click', function() {
+    btnCheckout.addEventListener('click', () => {
       fetch("/menu/checkout/", {
         method: 'POST',
         headers: {
@@ -175,54 +159,104 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({}),
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          // Sembunyikan tombol checkout
-          btnCheckout.style.display = 'none';
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            btnCheckout.style.display = 'none';
+            const qrSection = document.getElementById('qrcode-payment-section');
+            if (qrSection) qrSection.innerHTML = data.html_qrcode_form;
 
-          // Isi QR code & form di modal
-          const qrSection = document.getElementById('qrcode-payment-section');
-          if(qrSection) {
-            qrSection.innerHTML = data.html_qrcode_form;
+            Toastify({
+              text: "Checkout berhasil, lanjutkan pembayaran",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#4CAF50"
+            }).showToast();
+          } else {
+            Swal.fire("Checkout gagal", data.message || '', "error");
           }
-
+        })
+        .catch(() => {
           Toastify({
-            text: "Checkout berhasil, silakan lanjutkan pembayaran",
+            text: "Terjadi kesalahan saat checkout",
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: "#4CAF50",
+            backgroundColor: "#f44336"
           }).showToast();
-        } else {
-          alert(data.message || 'Checkout gagal.');
-        }
-      })
-      .catch(() => {
-        Toastify({
-          text: "Terjadi kesalahan saat checkout",
-          duration: 3000,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#f44336",
-        }).showToast();
-      });
+        });
     });
   }
 
-  // Fungsi dapatkan csrf token dari cookie (pastikan ada satu saja fungsi ini di file)
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        cookie = cookie.trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
+  document.body.addEventListener('submit', function (e) {
+    if (e.target && e.target.id === 'formBuktiBayar') {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const btnConfirm = document.getElementById('btnConfirmPayment');
+
+      fetch("/menu/upload-bukti/", {
+        method: "POST",
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            Toastify({
+              text: "✅ Bukti berhasil diupload",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#4CAF50"
+            }).showToast();
+            if (btnConfirm) btnConfirm.disabled = false;
+          } else {
+            Toastify({
+              text: `❌ Gagal upload: ${data.message || 'Terjadi kesalahan'}`,
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336"
+            }).showToast();
+          }
+        });
     }
-    return cookieValue;
-  }
+  });
+
+  document.body.addEventListener('click', function (event) {
+    if (event.target && event.target.id === 'btnConfirmPayment') {
+      const button = event.target;
+      if (button.disabled) return; // mencegah klik ulang
+
+      button.disabled = true;
+      button.innerText = "Memproses...";
+
+      fetch("/menu/confirm-payment/", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'success') {
+          Toastify({ text: "✅ Pembayaran dikonfirmasi!", backgroundColor: "#4CAF50" }).showToast();
+          bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+          updateCartIcon();
+          loadCart();
+        } else {
+          Toastify({ text: "❌ Gagal konfirmasi", backgroundColor: "#f44336" }).showToast();
+        }
+      })
+      .finally(() => {
+        button.disabled = false;
+        button.innerText = "Saya sudah bayar";
+      });
+    }
+  });
 });

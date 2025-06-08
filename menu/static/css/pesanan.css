@@ -4,6 +4,9 @@
 @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
+/* =========================
+   PESANAN CONTAINER
+========================= */
 .pesanan-container {
   max-width: 900px;
   margin: 40px auto;
@@ -23,6 +26,9 @@
   color: #5c4433;
 }
 
+/* =========================
+   TABEL PESANAN
+========================= */
 .pesanan-container table {
   width: 100%;
   border-collapse: separate;
@@ -61,24 +67,60 @@
   text-align: center;
 }
 
-.status-label {
+/* =========================
+   STATUS PESANAN BADGE
+========================= */
+.badge-status {
   display: inline-block;
-  padding: 5px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.badge-status.menunggu {
+  background-color: #ffe082;
+  color: #795548;
+  border-color: #ffd54f;
+}
+
+.badge-status.proses {
+  background-color: #90caf9;
+  color: #0d47a1;
+  border-color: #64b5f6;
+}
+
+.badge-status.siap {
+  background-color: #a5d6a7;
+  color: #1b5e20;
+  border-color: #81c784;
+}
+
+.badge-status.selesai {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+  border-color: #a5d6a7;
+}
+
+/* =========================
+   TOTAL HARGA
+========================= */
+.total-harga {
+  text-align: right;
+  margin-top: 20px;
+  font-size: 1.2rem;
   font-weight: 700;
-  font-size: 0.9rem;
-  color: white;
+  color: #5c4433;
+  border-top: 2px solid #ccc;
+  padding-top: 12px;
 }
 
-.status-proses {
-  background-color: #d9a204; /* kuning keemasan */
-}
-
-.status-selesai {
-  background-color: #3b7d48; /* hijau */
-}
-
-/* Responsive untuk layar kecil */
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 600px) {
   .pesanan-container {
     padding: 15px;
@@ -118,45 +160,8 @@
     font-weight: 700;
     color: #5c4433;
   }
-}
-
-/* =========================
-   STATUS PESANAN BADGE
-========================= */
-.badge-status {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.badge-status.aktif {
-  background-color: #e0e0e0;
-  color: #5c4433;
-  border: 1px solid #ccc;
-}
-
-.badge-status.proses {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
-}
-
-.badge-status.selesai {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.total-harga {
-  text-align: right;
-  margin-top: 20px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #5c4433;
-  border-top: 2px solid #ccc;
-  padding-top: 12px;
+  .badge-status.menunggu {
+    background-color: #ffcc80 !important;
+    color: #4e342e !important;
+  }
 }
